@@ -2,67 +2,81 @@ import sys
 
 class CsvRead:
     def __init__(self, fileName):
-        self._fileName = fileName
-        self._file = None
-        self._linesFromFile = []
-        self._timeStamp_Column = -1
-        self._open_Column = -1
-        self._high_Column = -1
-        self._low_Column = -1
-        self._close_Column = -1
-        self._adjustedClose_Column = -1
-        self._volume_Column = -1
-        self._dividendAmount_Column = -1
-        self._splitCoefficient_Column = -1
+        self.fileName = fileName
+        self.file = None
+        self.linesFromFile = []
 
-        self._file = open(self._fileName, "r")
+        self.timeStamp_Column = -1
+        self.open_Column = -1
+        self.high_Column = -1
+        self.low_Column = -1
+        self.close_Column = -1
+        self.adjustedClose_Column = -1
+        self.volume_Column = -1
+        self.dividendAmount_Column = -1
+        self.splitCoefficient_Column = -1
 
-        #self._line = False
+        self.file = open(self.fileName, "r")
 
     def __str__(self):
-        return self._timeStamp_Column self._open_Column
-        print self._timeStamp_Column
-        print self._open_Column
-        print self._high_Column
-        print self._low_Column
-        print self._close_Column
-        print self._adjustedClose_Column
-        print self._volume_Column
-        print self._dividendAmount_Column
-        print self._splitCoefficient_Column
+        myString = ""
+        myString += "timestamp:" + str(self.timeStamp_Column) + '\n'
+        myString += "open:" + str(self.open_Column) + '\n'
+        myString += "high:" + str(self.high_Column) + '\n'
+        myString += "low:" + str(self.low_Column) + '\n'
+        myString += "close:" + str(self.close_Column) + '\n'
+        myString += "adjusted_close:" + str(self.adjustedClose_Column) + '\n'
+        myString += "volume:" + str(self.volume_Column) + '\n'
+        myString += "dividend_amount:" + str(self.dividendAmount_Column) + '\n'
+        myString += "split_coefficient:" + str(self.splitCoefficient_Column) + '\n'
+
+        return myString
+
 
     def setColumns(self, line):
         columns = line.split(',')
         i = 0
-        print columns
         for var in columns:
+            # remove the newline char for the last column and any other whitespace
+            var = var.rstrip()
             if var == "timestamp":
-                self._timeStamp_Column = i
+                self.timeStamp_Column = i
             elif var == "open":
-                self._open_Column = i
+                self.open_Column = i
             elif var == "high":
-                self._high_Column = i
+                self.high_Column = i
             elif var == "low":
-                self._low_Column = i
+                self.low_Column = i
             elif var == "close":
-                self._close_Column
+                self.close_Column = i
             elif var == "adjusted_close":
-                self._adjustedClose_Column
+                self.adjustedClose_Column = i
             elif var == "volume":
-                self._volume_Column = i
+                self.volume_Column = i
             elif var == "dividend_amount":
-                self._dividendAmount_Column = i
+                self.dividendAmount_Column = i
             elif var == "split_coefficient":
-                self._splitCoefficient_Column = i
-
+                self.splitCoefficient_Column = i
             i += 1
 
     def parseFileToLines(self):
-        firstLine = self._file.readline()
+        firstLine = self.file.readline()
         self.setColumns(firstLine)
+
+    def getLines(self):
+        i = 0
+        for row in self.file:
+            self.linesFromFile.append(row)
+
+    def closeFile(self):
+        self.file.close()
+
 
 if __name__ == "__main__":
     inputFile = sys.argv[1]
     myRead = CsvRead(inputFile)
     myRead.parseFileToLines()
-    print myRead
+    myRead.getLines()
+    print("Number of lines: " + str(len(myRead.linesFromFile)))
+    print(myRead.linesFromFile[0])
+    myRead.closeFile()
