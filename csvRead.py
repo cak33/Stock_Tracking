@@ -40,9 +40,9 @@ class CsvRead:
 
 
     def setColumns(self, line):
-        columns = line.split(',')
+        #columns = line.split(',')
         i = 0
-        for var in columns:
+        for var in line:
             # remove the newline char for the last column and any other whitespace
             var = var.rstrip()
             if var == "timestamp":
@@ -63,14 +63,15 @@ class CsvRead:
                 self.dividendAmount_Column = i
             elif var == "split_coefficient":
                 self.splitCoefficient_Column = i
+            elif var == "SMA_Price":
+                self.smaPrice_Column = i
+            elif var == "upper_bound":
+                self.aboveRail_Column = i
+            elif var == "lower_bound":
+                self.belowRail_Column = i
             i += 1
-
-        self.smaPrice_Column = i
-        self.aboveRail_Column = i + 1
-        self.belowRail_Column = i + 2
-
+            
     def parseFileToLines(self):
-        self.setColumns(self.firstLine)
         i = 0
         for line in self.file:
             currLine = line.split(',')                       # create an instance of Line
@@ -82,6 +83,7 @@ class CsvRead:
                 newLine.append("upper_bound")
                 newLine.append("lower_bound")
                 self.firstLine = newLine
+                self.setColumns(self.firstLine)
             else:
                 # Add 3 blank items for the additional columns we are adding
                 newLine.append(0)
