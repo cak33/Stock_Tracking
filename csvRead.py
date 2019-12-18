@@ -73,15 +73,23 @@ class CsvRead:
         self.firstLine = self.file.readline()
         self.setColumns(self.firstLine)
         i = 0
-        for row in self.file:
-            currLine = row.split(',')                           # create an instance of Line
-
-            # Add 3 blank items for the additional columns we are adding
-            currLine.append(0)
-            currLine.append(0)
-            currLine.append(0)
-
-            self.entries.append(currLine)                       # Append the current line for processing
+        for line in self.file:
+            currLine = line.split(',')                       # create an instance of Line
+            newLine = []
+            for item in currLine:
+                newLine.append(item.rstrip())
+            if i == 0:
+                newLine.append("SMA_Price")
+                newLine.append("upper_bound")
+                newLine.append("lower_bound")
+                self.firstLine = newLine
+            else:
+                # Add 3 blank items for the additional columns we are adding
+                newLine.append(0)
+                newLine.append(0)
+                newLine.append(0)
+                self.entries.append(newLine)               # Append the current line for processing
+            i += 1
 
     def closeFile(self):
         self.file.close()
@@ -121,7 +129,7 @@ class CsvRead:
         i = 0
         for currItem in entry:
             if i == len(entry)-1:
-                writeString += str(currItem)
+                writeString += str(currItem) + '\n'
             else:
                 writeString += str(currItem) + ","
             i += 1
@@ -129,9 +137,7 @@ class CsvRead:
 
     def writeEntriesToCSV(self, fileName):
         f = open(fileName, "w")
-        # TODO: Remove hard code of this
-        f.write("timestamp,open,high,low,close,adjusted_close,volume,"
-                "dividend_amount,split_coefficient,SMA_Price,upper_bound,lower_bound\n")
+        f.write(self.entryToString(self.firstLine))
         for entry in self.entries:
             f.write(self.entryToString(entry))
         f.close()
