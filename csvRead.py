@@ -40,7 +40,6 @@ class CsvRead:
 
 
     def setColumns(self, line):
-        #columns = line.split(',')
         i = 0
         for var in line:
             # remove the newline char for the last column and any other whitespace
@@ -70,7 +69,7 @@ class CsvRead:
             elif var == "lower_bound":
                 self.belowRail_Column = i
             i += 1
-            
+
     def parseFileToLines(self):
         i = 0
         for line in self.file:
