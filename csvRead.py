@@ -153,14 +153,14 @@ if __name__ == "__main__":
     simpleMovingAvg = 10        # TODO:remove this, should be received via the command line
     railCalcPercentage = .1     # TODO:remove this, should be received via the command line
 
-    # TODO: Calculate the Rails
     myRead.calculateRails(simpleMovingAvg, railCalcPercentage)
 
     # TODO: Get the breakthroughs
 
     # TODO: Write the breakthroughs back to the csv
+    myRead.writeEntriesToCSV("output.csv")
 
     #print("Number of lines: " + str(len(myRead.linesFromFile)))
     #print(myRead.linesFromFile[0])
-    myRead.writeEntriesToCSV("output.csv")
+
     myRead.closeFile()
