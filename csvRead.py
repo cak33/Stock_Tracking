@@ -70,7 +70,6 @@ class CsvRead:
         self.belowRail_Column = i + 2
 
     def parseFileToLines(self):
-        self.firstLine = self.file.readline()
         self.setColumns(self.firstLine)
         i = 0
         for line in self.file:
@@ -124,6 +123,9 @@ class CsvRead:
             i += 1
             correctDirectionIndex -= 1
 
+    #def getBreakthroughs(self, safety):
+
+
     def entryToString(self, entry):
         writeString = ""
         i = 0
@@ -152,10 +154,12 @@ if __name__ == "__main__":
     # TODO: Add functionality for setting up parameters
     simpleMovingAvg = 10        # TODO:remove this, should be received via the command line
     railCalcPercentage = .1     # TODO:remove this, should be received via the command line
+    marginOfSafety = .05
 
     myRead.calculateRails(simpleMovingAvg, railCalcPercentage)
 
     # TODO: Get the breakthroughs
+    #myRead.getBreakthroughs(marginOfSafety)
 
     # TODO: Write the breakthroughs back to the csv
     myRead.writeEntriesToCSV("output.csv")
