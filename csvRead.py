@@ -21,6 +21,7 @@ class CsvRead:
         self.smaPrice_Column = -1
         self.aboveRail_Column = -1
         self.belowRail_Column = -1
+        self.breakthrough_Column = -1
 
         self.file = open(self.fileName, "r")
 
@@ -68,6 +69,8 @@ class CsvRead:
                 self.aboveRail_Column = i
             elif var == "lower_bound":
                 self.belowRail_Column = i
+            elif var == "breakthrough":
+                self.breakthrough_Column = i
             i += 1
 
     def parseFileToLines(self):
@@ -81,10 +84,12 @@ class CsvRead:
                 newLine.append("SMA_Price")
                 newLine.append("upper_bound")
                 newLine.append("lower_bound")
+                newLine.append("breakthrough")
                 self.firstLine = newLine
                 self.setColumns(self.firstLine)
             else:
-                # Add 3 blank items for the additional columns we are adding
+                # Add 4 blank items for the additional columns we are adding
+                newLine.append(0)
                 newLine.append(0)
                 newLine.append(0)
                 newLine.append(0)
@@ -124,8 +129,18 @@ class CsvRead:
             i += 1
             correctDirectionIndex -= 1
 
-    #def getBreakthroughs(self, safety):
-
+    def getBreakthroughs(self, simpleMovingAvg, safety):
+        i = 0
+        for entry in self.entries:
+            if i < len(self.entries) - simpleMovingAvg:
+                # calculate upper and lower safety
+                upperPlusSafety = float(entry[self.adjustedClose_Column]) * (1 + safety)
+                lowerPlusSafety = float(entry[self.adjustedClose_Column]) * (1 - safety)
+                if entry[self.smaPrice_Column] > upperPlusSafety:
+                    entry[self.breakthrough_Column] = "UPPER"
+                elif entry[self.smaPrice_Column] < lowerPlusSafety:
+                    entry[self.breakthrough_Column] = "LOWER"
+            i += 1
 
     def entryToString(self, entry):
         writeString = ""
@@ -139,33 +154,53 @@ class CsvRead:
         return writeString
 
     def writeEntriesToCSV(self, fileName):
+        print fileName
         f = open(fileName, "w")
         f.write(self.entryToString(self.firstLine))
         for entry in self.entries:
             f.write(self.entryToString(entry))
         f.close()
 
+
 if __name__ == "__main__":
-    inputFile = sys.argv[1]
-
-    # Open the file and get the lies parsed for processing
-    myRead = CsvRead(inputFile)
-    myRead.parseFileToLines()
-
-    # TODO: Add functionality for setting up parameters
-    simpleMovingAvg = 10        # TODO:remove this, should be received via the command line
-    railCalcPercentage = .1     # TODO:remove this, should be received via the command line
+    simpleMovingAvg = 10
+    railCalcPercentage = .10
     marginOfSafety = .05
+    inputFile = ""
+    outputFileName = "output"
 
-    myRead.calculateRails(simpleMovingAvg, railCalcPercentage)
+    i = 0
+    # parse the args
+    for arg in sys.argv:
+        if arg == "-help" or len(sys.argv) == 1:
+            print "-file: The input file name (include the .csv)"
+            print "-margin: The margin of safety in .XX format"
+            print "-rail: The \"rail\" percentage in .XX format"
+            print "-avg: The amount of days for the moving average"
+            print "-o: The output file name (do no include the extension"
+            print "Default Values:"
+            print "Moving Average = " + str(simpleMovingAvg)
+            print "Rail percentage = " + str(railCalcPercentage)
+            print "Margin of Safety = " + str(marginOfSafety)
+            print "Output File = " + outputFileName + ".csv"
+        elif arg == "-file":
+            inputFile = sys.argv[i+1]
+        elif arg == "-margin":
+            marginOfSafety = float(sys.argv[i+1])
+        elif arg == "-rail":
+            railCalcPercentage = float(sys.argv[i+1])
+        elif arg == "-avg":
+            simpleMovingAvg = int(sys.argv[i+1])
+        elif arg == "-o":
+            outputFileName = str(sys.argv[i+1])
+        i += 1
 
-    # TODO: Get the breakthroughs
-    #myRead.getBreakthroughs(marginOfSafety)
+    if inputFile != "":
+        # Open the file and get the lies parsed for processing
+        myRead = CsvRead(inputFile)
+        myRead.parseFileToLines()
+        myRead.calculateRails(simpleMovingAvg, railCalcPercentage)
+        myRead.getBreakthroughs(simpleMovingAvg, marginOfSafety)
+        myRead.writeEntriesToCSV(outputFileName + ".csv")
 
-    # TODO: Write the breakthroughs back to the csv
-    myRead.writeEntriesToCSV("output.csv")
-
-    #print("Number of lines: " + str(len(myRead.linesFromFile)))
-    #print(myRead.linesFromFile[0])
-
-    myRead.closeFile()
+        myRead.closeFile()
