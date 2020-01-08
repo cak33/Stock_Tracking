@@ -129,16 +129,14 @@ class CsvRead:
             i += 1
             correctDirectionIndex -= 1
 
-    def getBreakthroughs(self, simpleMovingAvg, safety):
+    def getBreakthroughs(self, simpleMovingAvg):
         i = 0
         for entry in self.entries:
             if i < len(self.entries) - simpleMovingAvg:
                 # calculate upper and lower safety
-                upperPlusSafety = float(entry[self.adjustedClose_Column]) * (1 + safety)
-                lowerPlusSafety = float(entry[self.adjustedClose_Column]) * (1 - safety)
-                if entry[self.smaPrice_Column] > upperPlusSafety:
+                if entry[self.smaPrice_Column] > entry[self.aboveRail_Column]:
                     entry[self.breakthrough_Column] = "UPPER"
-                elif entry[self.smaPrice_Column] < lowerPlusSafety:
+                elif entry[self.smaPrice_Column] < entry[self.belowRail_Column]:
                     entry[self.breakthrough_Column] = "LOWER"
             i += 1
 
@@ -165,7 +163,6 @@ class CsvRead:
 if __name__ == "__main__":
     simpleMovingAvg = 10
     railCalcPercentage = .10
-    marginOfSafety = .05
     inputFile = ""
     outputFileName = "output"
 
@@ -174,7 +171,6 @@ if __name__ == "__main__":
     for arg in sys.argv:
         if arg == "-help" or len(sys.argv) == 1:
             print "-file: The input file name (include the .csv)"
-            print "-margin: The margin of safety in .XX format"
             print "-rail: The \"rail\" percentage in .XX format"
             print "-avg: The amount of days for the moving average"
             print "-o: The output file name (do no include the extension"
@@ -185,8 +181,6 @@ if __name__ == "__main__":
             print "Output File = " + outputFileName + ".csv"
         elif arg == "-file":
             inputFile = sys.argv[i+1]
-        elif arg == "-margin":
-            marginOfSafety = float(sys.argv[i+1])
         elif arg == "-rail":
             railCalcPercentage = float(sys.argv[i+1])
         elif arg == "-avg":
@@ -200,7 +194,7 @@ if __name__ == "__main__":
         myRead = CsvRead(inputFile)
         myRead.parseFileToLines()
         myRead.calculateRails(simpleMovingAvg, railCalcPercentage)
-        myRead.getBreakthroughs(simpleMovingAvg, marginOfSafety)
+        myRead.getBreakthroughs(simpleMovingAvg)
         myRead.writeEntriesToCSV(outputFileName + ".csv")
 
         myRead.closeFile()
