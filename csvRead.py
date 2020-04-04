@@ -165,6 +165,7 @@ if __name__ == "__main__":
     railCalcPercentage = .10
     inputFile = ""
     outputFileName = "output"
+    marginOfSafety = .05
 
     i = 0
     # parse the args

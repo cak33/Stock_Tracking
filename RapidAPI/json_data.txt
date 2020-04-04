@@ -1,0 +1,1 @@
+{"prices":[{"date":1546439400,"open":13.260000228881836,"high":13.289999961853027,"low":12.8100004196167,"close":13.010000228881836,"volume":6900300,"adjclose":13.010000228881836}],"isPending":false,"firstTradeDate":733654800,"id":"1d15464484001546448402","timeZone":{"gmtOffset":-14400},"eventsData":[]}
